@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { connect } from 'react-redux'
+import { openDrawerActionCreator } from '../state/drawer'
 
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -17,7 +18,7 @@ const styles = {
   logo: { cursor: 'pointer' }
 }
 
-const MenuAppBar = () => {
+const MenuAppBar = props => {
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
 
@@ -33,7 +34,12 @@ const MenuAppBar = () => {
     <div >
       <AppBar position="static">
         <Toolbar style={styles.toolbar}>
-          <IconButton edge="start" color="inherit" aria-label="menu">
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            onClick={props._drawerOpen}
+          >
             <MenuIcon />
           </IconButton>
           <img
@@ -76,7 +82,9 @@ const MenuAppBar = () => {
   )
 }
 
-const mapDispatchToProps = () => ({})
+const mapDispatchToProps = (dispatch) => ({
+  _drawerOpen: () => dispatch(openDrawerActionCreator())
+})
 
 export default connect(
   null,
