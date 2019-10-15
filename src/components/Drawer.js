@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
 
 import { connect } from 'react-redux'
 import { openDrawerActionCreator, closeDrawerActionCreator } from '../state/drawer'
@@ -6,9 +7,9 @@ import { openDrawerActionCreator, closeDrawerActionCreator } from '../state/draw
 import { SwipeableDrawer, List, ListItemText, ListItem } from '@material-ui/core'
 
 const links = [
-  { title: 'Dodaj przepis' },
-  { title: 'Przepisy' },
-  { title: 'Twoje przepisy' },
+  { title: 'Dodaj przepis', route: '/add-recipe' },
+  { title: 'Przepisy', route: '/recipes' },
+  { title: 'Twoje przepisy', route: 'your-recipes' },
 ]
 
 const Drawer = props => {
@@ -21,7 +22,10 @@ const Drawer = props => {
       <List>
         {links.map(link => (
           <ListItem
-            onClick={props._close}
+            onClick={() => {
+              props._close()
+              props.history.push(link.route)
+            }}
             button={true}
             key={link.title}
           >
@@ -47,4 +51,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Drawer)
+)(withRouter(Drawer))

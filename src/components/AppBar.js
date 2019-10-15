@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouter, Link } from 'react-router-dom'
 
 import { connect } from 'react-redux'
 import { openDrawerActionCreator } from '../state/drawer'
@@ -15,7 +16,8 @@ import logo from '../img/logo.png'
 
 const styles = {
   toolbar: { justifyContent: 'space-between' },
-  logo: { cursor: 'pointer' }
+  logo: { cursor: 'pointer' },
+  link: { textDecoration: 'none', color: 'black' }
 }
 
 const MenuAppBar = props => {
@@ -43,6 +45,7 @@ const MenuAppBar = props => {
             <MenuIcon />
           </IconButton>
           <img
+            onClick={() => props.history.push('/')}
             style={styles.logo}
             src={logo}
             alt='logo'
@@ -72,13 +75,17 @@ const MenuAppBar = props => {
               open={open}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose}>Zmień hasło</MenuItem>
-              <MenuItem onClick={handleClose}>Wyloguj się</MenuItem>
+              <Link to='/change-password' style={styles.link}>
+                <MenuItem onClick={handleClose}>Zmień hasło</MenuItem>
+              </Link>
+              <Link to='/' style={styles.link}>
+                <MenuItem onClick={handleClose}>Wyloguj się</MenuItem>
+              </Link>
             </Menu>
           </div>
         </Toolbar>
       </AppBar>
-    </div>
+    </div >
   )
 }
 
@@ -89,4 +96,4 @@ const mapDispatchToProps = (dispatch) => ({
 export default connect(
   null,
   mapDispatchToProps
-)(MenuAppBar)
+)(withRouter(MenuAppBar))
