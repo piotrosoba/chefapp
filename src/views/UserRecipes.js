@@ -1,11 +1,37 @@
 import React from 'react'
 
-const UserRecipes = props => {
-  return (
-    <div>
-      Twoje przepisy
-    </div>
-  )
+import { connect } from 'react-redux'
+import { getRecipesAsyncActionCreator } from '../state/recipes'
+
+class UserRecipes extends React.Component {
+  state = {
+
+  }
+
+  componentDidMount() {
+    this.getData()
+  }
+
+  getData = () => {
+    this.props._getData()
+  }
+
+  render() {
+    return (
+      <div>
+
+      </div>
+    )
+  }
 }
 
-export default UserRecipes
+const mapStateToProps = state => ({})
+
+const mapDispatchToProps = dispatch => ({
+  _getData: () => dispatch(getRecipesAsyncActionCreator())
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UserRecipes)

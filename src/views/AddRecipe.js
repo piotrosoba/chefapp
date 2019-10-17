@@ -1,8 +1,11 @@
 import React from 'react'
 
 import { connect } from 'react-redux'
+import { addRecipeAsyncActionCreator } from '../state/recipes'
 
-import { TextField, InputAdornment } from '@material-ui/core'
+import { TextField, InputAdornment, Typography, Button } from '@material-ui/core'
+
+import Ingredienst from '../components/Ingredients'
 
 const MAX_NAME_LENGTH = 45
 const MIN_NAME_LENGTH = 4
@@ -12,11 +15,28 @@ const MAX_TIME = 240
 
 const styles = {
   div: { display: 'flex', flexDirection: 'column', alignItems: 'center' },
-  input: { maxWidth: 380, margin: '10px 0' }
+  input: { maxWidth: 380, margin: '10px 0' },
+  title: { fontWeight: 'bold', margin: 30 },
+  link: { fontSize: '1.5rem', fontWeight: 'bold', cursor: 'pointer' },
+  randomPhoto: { marginTop: -10, marginBottom: 10, cursor: 'pointer', color: 'blue' }
 }
 
+
 const AddRecipe = props => {
-  const [name, setName] = React.useState('')
+  const formInStorage = JSON.parse(localStorage.getItem('form'))
+
+  React.useEffect(() => {
+    const form = {
+      name,
+      description,
+      ingredients,
+      time,
+      photo
+    }
+    localStorage.setItem('form', JSON.stringify(form))
+  })
+
+  const [name, setName] = React.useState(formInStorage.name || '')
   const [nameError, setNameError] = React.useState(false)
   const nameValidate = (value) => {
     const validValue = value && value.replace(/\s{2,}/g, ' ')
@@ -33,7 +53,7 @@ const AddRecipe = props => {
     }
   }
 
-  const [description, setDescription] = React.useState('')
+  const [description, setDescription] = React.useState(formInStorage.description || '')
   const [descriptionError, setDescriptionError] = React.useState(false)
   const descriptionValidate = value => {
     const validValue = value && value.replace(/\s{2,}/g, ' ')
@@ -50,7 +70,7 @@ const AddRecipe = props => {
     }
   }
 
-  const [time, setTime] = React.useState('')
+  const [time, setTime] = React.useState(formInStorage.time || '')
   const [timeError, setTimeError] = React.useState(false)
   const timeValidate = (value) => {
     value = Number(Number(value).toFixed(2))
@@ -63,12 +83,48 @@ const AddRecipe = props => {
     setTime(value < 0 ? 0 : value > MAX_TIME ? MAX_TIME : value)
   }
 
-  const [photo, setPhoto] = React.useState('')
+  const [photo, setPhoto] = React.useState(formInStorage.photo || '')
   const [photoError, setPhotoError] = React.useState(false)
   const photoValidate = value => {
     const isError = !value || !value.match(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/)
     setPhotoError(isError)
     return isError
+  }
+
+  const [ingredients, setIngredients] = React.useState(formInStorage.ingredients || [])
+  const [ingredientsError, setIngredientsError] = React.useState(false)
+  const ingredientsValidate = value => {
+    const isError = value.length === 0
+    setIngredientsError(isError)
+    return isError
+  }
+
+  const onSubmit = () => {
+    const isNameError = nameValidate(name)
+    const isDescriptionError = descriptionValidate(description)
+    const isIngredientsError = ingredientsValidate(ingredients)
+    const isTimeError = timeValidate(time)
+    const isPhotoError = photoValidate(photo)
+
+    if (!isNameError && !isDescriptionError && !isIngredientsError && !isTimeError && !isPhotoError) {
+      const form = {
+        name,
+        description,
+        ingredients,
+        time,
+        photo
+      }
+
+      props._addRecipe(form)
+        .then(() => {
+          setName('')
+          setDescription('')
+          setIngredients([])
+          setTime('')
+          setPhoto('')
+        })
+        .catch(() => { })
+    }
   }
 
   const inputs = [
@@ -79,6 +135,9 @@ const AddRecipe = props => {
       error: nameError,
       validate: nameValidate,
       helperText: 'Zbyt krótka nazwa, minimum 4 znaki'
+    },
+    {
+      label: 'Składniki'
     },
     {
       label: 'Sposób przyrządzenia',
@@ -115,7 +174,33 @@ const AddRecipe = props => {
     <div
       style={styles.div}
     >
-      {inputs.map(input => (
+      <Typography
+        style={styles.title}
+        align='center'
+        variant='h5'
+        color='secondary'
+      >
+        Dodaj przepis.
+        <br />
+        Przepis zostanie dodany do{' '}
+        <Typography
+          style={styles.link}
+          display='inline'
+          color='primary'
+          onClick={() => props.history.push('/your-recipes')}
+        >
+          Twojej listy.
+        </Typography>
+      </Typography>
+      {inputs.map(input => input.label === 'Składniki' ?
+        <Ingredienst
+          key={input.label}
+          ingredients={ingredients}
+          setIngredients={setIngredients}
+          ingredientsError={ingredientsError}
+          setIngredientsError={setIngredientsError}
+        />
+        :
         <TextField
           key={input.label}
           style={styles.input}
@@ -137,14 +222,32 @@ const AddRecipe = props => {
           InputProps={input.InputProps}
           placeholder={input.placeholder}
         />
-      ))}
+      )}
+      <Typography
+        style={styles.randomPhoto}
+        onClick={() => {
+          setPhoto('https://source.unsplash.com/random')
+          setPhotoError(false)
+        }}
+      >
+        (losowe zdjęcie)
+      </Typography>
+      <Button
+        color='primary'
+        variant='contained'
+        onClick={onSubmit}
+      >
+        Dodaj przepis
+      </Button>
     </div>
   )
 }
 
 const mapStateToProps = state => ({})
 
-const mapDispatchToProps = dispatch => ({})
+const mapDispatchToProps = dispatch => ({
+  _addRecipe: (form) => dispatch(addRecipeAsyncActionCreator(form))
+})
 
 export default connect(
   mapStateToProps,
