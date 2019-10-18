@@ -9,6 +9,8 @@ import theme from './theme.js'
 
 import App from './App'
 
+import './main.css'
+
 ReactDOM.render(
   <Provider store={store}>
     <MuiThemeProvider theme={theme}>
