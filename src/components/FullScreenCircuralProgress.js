@@ -14,7 +14,8 @@ const styles = {
     backgroundColor: 'rgba(36, 41, 41, 0.8)',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    zIndex: 900000
   },
   circular: { color: '#ffff33' }
 }

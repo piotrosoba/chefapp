@@ -13,13 +13,14 @@ const styles = {
 }
 
 const RecipesList = props => {
-  console.log(props)
   return (
     <div style={styles.container}>
       {props.data.map(recipe => (
         <RecipesListItem
           key={recipe.key}
           data={recipe}
+          route={props.route}
+          changeRoute={props.changeRoute}
         />
       ))}
     </div>

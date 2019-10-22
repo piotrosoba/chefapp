@@ -29,6 +29,13 @@ const RecipesListItem = props => {
   return (
     <div
       style={styles.container}
+      onClick={() => {
+        props.changeRoute(props.route + '/' + props.data.key)
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        })
+      }}
     >
       <img
         style={styles.img}

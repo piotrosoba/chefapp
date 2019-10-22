@@ -35,6 +35,47 @@ export const getRecipesAsyncActionCreator = () => (dispatch, getState) => {
     })
 }
 
+export const deleteRecipeAsyncActionCreator = (key, success, error) => (dispatch, getState) => {
+  dispatch(circuralProgress.add())
+  axios.delete(URL + 'recipes/' + key + '.json')
+    .then(() => {
+      const recipes = getState().recipes.recipes
+      const recipesAfterDelete = recipes.filter(recipe => recipe.key !== key)
+      dispatch(saveRecipesActionCreator(recipesAfterDelete))
+      dispatch(addSnackbar('Przepis usunięto prawidłowo'))
+      dispatch(circuralProgress.remove())
+      success()
+    })
+    .catch(() => {
+      dispatch(addSnackbar('Usuwanie nie powiodło się, spróbuj ponownie później', 'red'))
+      dispatch(circuralProgress.remove())
+      error()
+    })
+}
+
+export const editRecipeAsyncActionCreator = (form, key, success, error) => (dispatch, getState) => {
+  dispatch(circuralProgress.add())
+  axios.patch(URL + 'recipes/' + key + '', form)
+    .then(() => {
+      const recipes = getState().recipes.recipes
+      const recipesAfterEdite = recipes.map(recipe => {
+        if (recipe.key === key) {
+          return form
+        }
+        return recipe
+      })
+      dispatch(saveRecipesActionCreator(recipesAfterEdite))
+      dispatch(addSnackbar('Przepis edytawno.'))
+      dispatch(circuralProgress.remove())
+      success()
+    })
+    .catch(() => {
+      dispatch(addSnackbar('Edytowanie nie powiodło się, spróbuj ponownie później', 'red'))
+      dispatch(circuralProgress.remove())
+      error()
+    })
+}
+
 const saveRecipesActionCreator = recipes => ({
   type: SAVE_RECIPES,
   recipes
