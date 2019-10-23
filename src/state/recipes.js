@@ -55,7 +55,7 @@ export const deleteRecipeAsyncActionCreator = (key, success, error) => (dispatch
 
 export const editRecipeAsyncActionCreator = (form, key, success, error) => (dispatch, getState) => {
   dispatch(circuralProgress.add())
-  axios.patch(URL + 'recipes/' + key + '', form)
+  axios.patch(URL + 'recipes/' + key + '.json', form)
     .then(() => {
       const recipes = getState().recipes.recipes
       const recipesAfterEdite = recipes.map(recipe => {
@@ -76,16 +76,23 @@ export const editRecipeAsyncActionCreator = (form, key, success, error) => (disp
     })
 }
 
-const saveRecipesActionCreator = recipes => ({
-  type: SAVE_RECIPES,
-  recipes
-})
+const saveRecipesActionCreator = recipes => {
+  const suggestions = recipes
+    .reduce((red, el) => [...red, ...el.ingredients], [])
+    .reduce((red, el) => red.includes(el.ingredient) ? red : [...red, el.ingredient], [])
+  return {
+    type: SAVE_RECIPES,
+    recipes,
+    suggestions
+  }
+}
 
 const errorOnGetRecipesActionCreator = () => ({ type: ERROR_ON_GET })
 
 const initialState = {
   recipes: [],
-  isError: false
+  suggestions: [],
+  isError: false,
 }
 
 export default (state = initialState, action) => {
@@ -94,7 +101,8 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isError: false,
-        recipes: action.recipes
+        recipes: action.recipes,
+        suggestions: action.suggestions,
       }
     case ERROR_ON_GET:
       return {
