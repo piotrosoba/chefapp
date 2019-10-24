@@ -3,6 +3,7 @@ import { withRouter, Link } from 'react-router-dom'
 
 import { connect } from 'react-redux'
 import { openDrawerActionCreator } from '../state/drawer'
+import { logOutActionCreator } from '../state/auth'
 
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -79,7 +80,7 @@ const MenuAppBar = props => {
                 <MenuItem onClick={handleClose}>Zmień hasło</MenuItem>
               </Link>
               <Link to='/' style={styles.link}>
-                <MenuItem onClick={handleClose}>Wyloguj się</MenuItem>
+                <MenuItem onClick={props._logOut}>Wyloguj się</MenuItem>
               </Link>
             </Menu>
           </div>
@@ -90,7 +91,8 @@ const MenuAppBar = props => {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  _drawerOpen: () => dispatch(openDrawerActionCreator())
+  _drawerOpen: () => dispatch(openDrawerActionCreator()),
+  _logOut: () => dispatch(logOutActionCreator())
 })
 
 export default connect(

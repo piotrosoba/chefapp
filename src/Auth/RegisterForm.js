@@ -39,7 +39,7 @@ const RegisterForm = props => {
     const isPwdError = pwdValidate(pwd)
     const isPwd2Error = pwd2Validate(pwd2)
     if (!isEmailError && !isPwdError && !isPwd2Error) {
-      console.log('próba rejestracji')
+      props._register(email, pwd)
     }
   }
 

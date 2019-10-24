@@ -11,6 +11,10 @@ import App from './App'
 
 import './main.css'
 
+import { autoLogInAsyncActionCreator } from './state/auth'
+
+store.dispatch(autoLogInAsyncActionCreator())
+
 ReactDOM.render(
   <Provider store={store}>
     <MuiThemeProvider theme={theme}>
