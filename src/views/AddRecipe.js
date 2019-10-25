@@ -23,7 +23,7 @@ const styles = {
 
 
 const AddRecipe = props => {
-  const formInStorage = JSON.parse(localStorage.getItem('form'))
+  const formInStorage = JSON.parse(localStorage.getItem('form')) || {}
 
   React.useEffect(() => {
     const form = {

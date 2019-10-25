@@ -22,6 +22,42 @@ const getSnackbarText = (string) => {
   }
 }
 
+export const authRequest = (url, method = 'get', data = {}) => (dispatch, getState) => {
+  const getUrlWithToken = () => {
+    const idToken = getState().auth.idToken
+    if (idToken) {
+      return url.includes('?') ? url + '&auth=' + idToken : url + '?auth=' + idToken
+    }
+    return url
+  }
+
+  return axios({
+    url: getUrlWithToken(),
+    method,
+    data
+  })
+    .catch(error => {
+      const refreshToken = localStorage.getItem('refreshToken')
+      if (refreshToken && error.response.statusText === 'Unauthorized')
+        return dispatch(useRefreshTokenAsyncActionCreator(refreshToken))
+          .then(() => {
+            return axios({
+              url: getUrlWithToken(),
+              method,
+              data
+            })
+          })
+          .catch((error) => {
+            dispatch(logOutActionCreator())
+            dispatch(addSnackbar('Twoja sesja wygasła zaloguj się ponownie!', 'red'))
+            return Promise.reject(error)
+          })
+      else {
+        return Promise.reject(error)
+      }
+    })
+}
+
 export const registerAsyncActionCreator = (email, password) => (dispatch, getState) => {
   dispatch(circuralProgress.add())
   axios.post(SING_UP_URL, {
@@ -107,15 +143,15 @@ export const autoLogInAsyncActionCreator = () => (dispatch, getState) => {
 
 const useRefreshTokenAsyncActionCreator = refreshToken => (dispatch, getState) => {
   dispatch(circuralProgress.add())
-  axios.post(REFRESH_TOKEN_URL, {
+  return axios.post(REFRESH_TOKEN_URL, {
     grant_type: 'refresh_token',
     refresh_token: refreshToken
   })
     .then(response => {
       const { id_token, refresh_token, user_id } = response.data
       dispatch(saveUserActionCreator(id_token, refresh_token, user_id))
+      return response
     })
-    .catch(() => { })
     .finally(() => dispatch(circuralProgress.remove()))
 }
 

@@ -1,15 +1,16 @@
-import axios from 'axios'
 import { URL } from '../consts/firebase'
 import { circuralProgress } from './fullScreenCircuralProgress'
 import { addSnackbar } from './snackbars'
 import mapObjectToArray from '../utilities/mapObjectToArray'
+import { authRequest } from './auth'
 
 const SAVE_RECIPES = 'recipes/SAVE_RECIPE'
 const ERROR_ON_GET = 'recipes/ERROR_ON_GET'
 
 export const addRecipeAsyncActionCreator = form => (dispatch, getState) => {
+  const userId = getState().auth.userId
   dispatch(circuralProgress.add())
-  return axios.post(URL + 'recipes.json', form)
+  return dispatch(authRequest(URL + 'users/' + userId + '/recipes.json', 'post', form))
     .then(() => {
       dispatch(circuralProgress.remove())
       dispatch(addSnackbar('Przepis dodano prawidłowo'))
@@ -22,8 +23,9 @@ export const addRecipeAsyncActionCreator = form => (dispatch, getState) => {
 }
 
 export const getRecipesAsyncActionCreator = () => (dispatch, getState) => {
+  const userId = getState().auth.userId
   dispatch(circuralProgress.add())
-  axios.get(URL + 'recipes.json')
+  dispatch(authRequest(URL + 'users/' + userId + '/recipes.json'))
     .then((response) => {
       const mappedData = mapObjectToArray(response.data)
       dispatch(saveRecipesActionCreator(mappedData))
@@ -36,8 +38,9 @@ export const getRecipesAsyncActionCreator = () => (dispatch, getState) => {
 }
 
 export const deleteRecipeAsyncActionCreator = (key, success, error) => (dispatch, getState) => {
+  const userId = getState().auth.userId
   dispatch(circuralProgress.add())
-  axios.delete(URL + 'recipes/' + key + '.json')
+  dispatch(authRequest(URL + 'users/' + userId + '/recipes/' + key + '.json', 'delete'))
     .then(() => {
       const recipes = getState().recipes.recipes
       const recipesAfterDelete = recipes.filter(recipe => recipe.key !== key)
@@ -54,8 +57,9 @@ export const deleteRecipeAsyncActionCreator = (key, success, error) => (dispatch
 }
 
 export const editRecipeAsyncActionCreator = (form, key, success, error) => (dispatch, getState) => {
+  const userId = getState().auth.userId
   dispatch(circuralProgress.add())
-  axios.patch(URL + 'recipes/' + key + '.json', form)
+  dispatch(authRequest(URL + 'users/' + userId + '/recipes/' + key + '.json', 'patch', form))
     .then(() => {
       const recipes = getState().recipes.recipes
       const recipesAfterEdite = recipes.map(recipe => {
